@@ -1,11 +1,10 @@
 {
   "folders": [
     {
-      "name": "app",
-      "path": "."
+      "path": "app"
     },
     {
-      "path": "../zmk"
+      "path": "zmk"
     }
   ],
   "extensions": {},
