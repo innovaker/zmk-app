@@ -1,0 +1,21 @@
+{
+  "folders": [
+    {
+      "name": "app",
+      "path": "."
+    },
+    {
+      "path": "../zmk"
+    }
+  ],
+  "extensions": {},
+  "settings": {},
+  "launch": {
+    "configurations": [],
+    "compounds": []
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": []
+  }
+}
