@@ -1,0 +1,28 @@
+{
+  "name": "ZMK Development",
+  "dockerFile": "Dockerfile",
+  "runArgs": ["--security-opt", "label=disable"],
+  "containerEnv": { "WORKSPACE_DIR": "${containerWorkspaceFolder}" },
+  "workspaceFolder": "/zmk-workspace/app",
+  "workspaceMount": "source=${localWorkspaceFolder},target=${containerWorkspaceFolder},type=bind,consistency=cached",
+  "mounts": [
+    //"source=${localWorkspaceFolder}/../zmk,target=${containerWorkspaceFolder}/../zmk,type=bind,consistency=cached",
+    //"source=zmk,target=${containerWorkspaceFolder}/../zmk,type=volume",
+    "source=zmk-zephyr,target=${containerWorkspaceFolder}/../zephyr,type=volume",
+    "source=zmk-zephyr-modules,target=${containerWorkspaceFolder}/../modules,type=volume",
+    "source=zmk-zephyr-tools,target=${containerWorkspaceFolder}/../tools,type=volume"
+  ],
+  "postCreateCommand": "cd ${containerWorkspaceFolder} && west init -l . && west update",
+  "extensions": [
+    "ms-vscode.cpptools",
+    "twxs.cmake",
+    "ms-python.python",
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "yzhang.markdown-all-in-one"
+  ],
+  "settings": {
+    "terminal.integrated.shell.linux": "/bin/bash"
+  },
+  "forwardPorts": [3000]
+}
