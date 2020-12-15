@@ -1,0 +1,59 @@
+name: Build
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: docker.io/zmkfirmware/zmk-build-arm:2.4
+    strategy:
+      matrix:
+        board:
+          - nice_nano
+        shield:
+          - corne_left
+          - corne_right
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          path: app
+        timeout-minutes: 1
+      - name: Cache modules
+        uses: actions/cache@v2
+        env:
+          cache-name: modules
+        with:
+          path: |
+            modules/
+            tools/
+            zephyr/
+            bootloader/
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/west.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+        timeout-minutes: 2
+        continue-on-error: true
+      - name: Initialize workspace (west init)
+        run: west init -l app
+      - name: Update modules (west update)
+        run: west update
+        timeout-minutes: 3
+      - name: Build (west build)
+        run: west build -p -c -s app -b ${{ matrix.board }} -- -DSHIELD=${{ matrix.shield }}
+      - name: DTS (.dts.pre.tmp)
+        if: ${{ always() }}
+        run: cat -n build/zephyr/*.dts.pre.tmp
+      - name: Kconfig
+        run: cat build/zephyr/.config | grep -v "^#" | grep -v "^$"
+      - name: Rename zmk.uf2
+        run: cp build/zephyr/zmk.uf2 ${{ matrix.board }}-${{ matrix.shield }}.uf2
+      - name: Archive
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.board }} & ${{ matrix.shield }}
+          path: ${{ matrix.board }}-${{ matrix.shield }}.uf2
